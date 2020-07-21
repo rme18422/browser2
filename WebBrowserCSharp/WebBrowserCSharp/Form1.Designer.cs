@@ -1,4 +1,7 @@
-﻿namespace WebBrowserCSharp
+﻿using System.Reflection;
+using System.Windows.Forms;
+
+namespace WebBrowserCSharp
 {
     partial class Form1
     {
@@ -29,7 +32,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.webBrowser1 = new extendedWebBrowser();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.UrlTextBox = new System.Windows.Forms.ToolStripTextBox();
@@ -276,6 +279,24 @@
         private System.Windows.Forms.ToolStripButton PrintPreviewButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton PropertiesButton;
+    }
+
+    class extendedWebBrowser : WebBrowser
+    {
+        /// <summary>
+        /// Default constructor which will make the browser to ignore all errors
+        /// </summary>
+        public extendedWebBrowser()
+        {
+            this.ScriptErrorsSuppressed = true;
+
+            FieldInfo field = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field != null)
+            {
+                object axIWebBrowser2 = field.GetValue(this);
+                axIWebBrowser2.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, axIWebBrowser2, new object[] { true });
+            }
+        }
     }
 }
 
